@@ -1,0 +1,92 @@
+== Modify the FUTURE crypto policy
+
+The Chief Security Officer sends out the following e-mail -
+
+In order to comply with the requirements set forth by the CSO above, you
+will update the system to modify the *FUTURE* policy to support shorter
+keys of 2048 bit length. By default, the minimum key length in the
+*FUTURE* policy is set to 3072-bit.
+
+You will now check the currently active crypto policy in effect on the
+system -
+
+[source,bash]
+----
+update-crypto-policies --show
+----
+
+Restart Apache.
+
+[source,bash]
+----
+systemctl restart httpd.service
+----
+
+The Apache service has failed to start. You will now check the status of
+the Apache service -
+
+[source,bash]
+----
+systemctl status httpd.service --no-pager
+----
+
+You can see a more specific error message in the SSL error log for
+Apache.
+
+[source,bash]
+----
+tail -2 /var/log/httpd/ssl_error_log
+----
+
+The error message indicates that the key length was too small which was
+expected because the *FUTURE* policy requires a minimum of 3072-bit
+keys.
+
+Now, you will create a policy modifier module called *2048KEYS.pmod*
+that can be used with the FUTURE crypto policy. Policy modifiers are
+text files that include policy instructions to the
+update-crypto-policies tool.
+
+The naming of these files must follow the following convention :
+*_MODULE_.pmod*, where *_MODULE_* is the name of the modifier in
+uppercase without spaces, and .pmod is the file extension in lowercase.
+
+Next, you will create a policy modifier called *2048KEYS.pmod* that will
+set the minimum key size to 2048 bits.
+
+[source,bash]
+----
+touch /etc/crypto-policies/policies/modules/2048KEYS.pmod
+----
+
+In the policy modifier file, you will specify the minimum key size of
+RSA and DH keys -
+
+[source,bash]
+----
+echo "min_dh_size = 2048" > /etc/crypto-policies/policies/modules/2048KEYS.pmod
+----
+
+[source,bash]
+----
+echo "min_rsa_size = 2048" >> /etc/crypto-policies/policies/modules/2048KEYS.pmod
+----
+
+You will now configure the system to use a modified *FUTURE* policy with
+our newly created policy modifier -
+
+[source,bash]
+----
+update-crypto-policies --set FUTURE:2048KEYS
+----
+
+If you want to apply multiple policy modifiers, you can chain together
+several policy modifiers separated using '`:`'. The policy modifiers are
+evaluated left to right to modify the specified named policy.
+
+You can now verify that the new policy has been applied to the system.
+
+[source,bash]
+----
+update-crypto-policies --show
+----

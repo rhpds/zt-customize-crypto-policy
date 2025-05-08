@@ -1,0 +1,15 @@
+---
+antora:
+  name: modules
+  dir: www
+  modules:
+    - name: "01-verify"
+      label: "Verify"
+      solveButton: true
+    - name: "02-reconcile"
+      label: "Reconcile"
+      solveButton: true
+
+tabs:
+  - name: ">_ terminal"
+    url: /wetty
