@@ -2,8 +2,20 @@
 
 The Chief Security Officer sends out the following e-mail -
 
+[source,text]
+----
+Application and Infrastructure Administrators,
+
+After my last e-mail recommending 3072 bit public keys, I have received few concerns that some applications would need additional time for migration.
+
+To continue supporting these applications running on our platform, and to provide more time for these applications to upgrade, my recommendation is to disallow TLS (1.0, and 1.1), and not allow SHA-1 hash usage.
+
+**NOTE** We should still allow 2048 bit ciphers usage for a certain period of time until all applications can be upgraded to use 3072 bit keys.
+
+-CSO
+----
 In order to comply with the requirements set forth by the CSO above, you
-will update the system to modify the *FUTURE* policy to support shorter
+will update the system to modify the existing *FUTURE* policy to support shorter
 keys of 2048 bit length. By default, the minimum key length in the
 *FUTURE* policy is set to 3072-bit.
 
@@ -14,12 +26,23 @@ system -
 ----
 update-crypto-policies --show
 ----
+[source,text]
+----
+rhel@rhel:~# update-crypto-policies --show
+FUTURE
+----
 
 Restart Apache.
 
 [source,bash]
 ----
-systemctl restart httpd.service
+sudo systemctl restart httpd.service
+----
+[source,text]
+----
+rhel@rhel:~# systemctl restart httpd.service
+Job for httpd.service failed because the control process exited with error code.
+See "systemctl status httpd.service" and "journalctl -xeu httpd.service" for details.
 ----
 
 The Apache service has failed to start. You will now check the status of
@@ -29,13 +52,23 @@ the Apache service -
 ----
 systemctl status httpd.service --no-pager
 ----
+[source,text]
+----
+
+----
 
 You can see a more specific error message in the SSL error log for
 Apache.
 
 [source,bash]
 ----
-tail -2 /var/log/httpd/ssl_error_log
+sudo tail -2 /var/log/httpd/ssl_error_log
+----
+[source,text]
+----
+[rhel@rhel ~]$ sudo tail -2 /var/log/httpd/ssl_error_log
+[Wed Jun 18 14:43:55.916631 2025] [ssl:emerg] [pid 29307:tid 29307] AH02562: Failed to configure certificate rhel.lab.sandbox-x5n8h-ocp4-cluster.svc.cluster.local:443:0 (with chain), check /etc/pki/tls/certs/localhost.crt
+[Wed Jun 18 14:43:55.916650 2025] [ssl:emerg] [pid 29307:tid 29307] SSL Library Error: error:0A00018F:SSL routines::ee key too small
 ----
 
 The error message indicates that the key length was too small which was
@@ -52,32 +85,38 @@ The naming of these files must follow the following convention :
 uppercase without spaces, and .pmod is the file extension in lowercase.
 
 Next, you will create a policy modifier called *2048KEYS.pmod* that will
-set the minimum key size to 2048 bits.
+set the minimum key size to 2048 bits. In the policy modifier file, you will specify the minimum key size of
+both RSA and DH keys -
 
 [source,bash]
 ----
-touch /etc/crypto-policies/policies/modules/2048KEYS.pmod
-----
-
-In the policy modifier file, you will specify the minimum key size of
-RSA and DH keys -
-
-[source,bash]
-----
-echo "min_dh_size = 2048" > /etc/crypto-policies/policies/modules/2048KEYS.pmod
+echo "min_rsa_size = 2048" > 2048KEYS.pmod
 ----
 
 [source,bash]
 ----
-echo "min_rsa_size = 2048" >> /etc/crypto-policies/policies/modules/2048KEYS.pmod
+echo "min_dh_size = 2048" >> 2048KEYS.pmod
 ----
 
+Copy the modifier file to the policy module directory
+[source,bash]
+----
+sudo cp 2048KEYS.pmod /etc/crypto-policies/policies/modules/2048KEYS.pmod
+----
 You will now configure the system to use a modified *FUTURE* policy with
 our newly created policy modifier -
 
 [source,bash]
 ----
-update-crypto-policies --set FUTURE:2048KEYS
+sudo update-crypto-policies --set FUTURE:2048KEYS
+----
+[source,text]
+----
+[rhel@rhel ~]$ sudo update-crypto-policies --set FUTURE:2048KEYS
+Setting system policy to FUTURE:2048KEYS
+Note: System-wide crypto policies are applied on application start-up.
+It is recommended to restart the system for the change of policies
+to fully take place.
 ----
 
 If you want to apply multiple policy modifiers, you can chain together
@@ -89,4 +128,9 @@ You can now verify that the new policy has been applied to the system.
 [source,bash]
 ----
 update-crypto-policies --show
+----
+[source,text]
+----
+[rhel@rhel ~]$ update-crypto-policies --show
+FUTURE:2048KEYS
 ----

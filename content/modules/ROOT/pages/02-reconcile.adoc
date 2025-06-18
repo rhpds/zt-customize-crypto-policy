@@ -9,7 +9,7 @@ ____
 
 [source,bash]
 ----
-systemctl restart httpd.service
+sudo systemctl restart httpd.service
 ----
 
 Verify that Apache is running on the machine.
@@ -18,6 +18,15 @@ Verify that Apache is running on the machine.
 ----
 systemctl status httpd.service --no-pager
 ----
+[source,text]
+----
+<< OUTPUT ABRIDGED >>
+
+Active: active (running) since Wed 2025-06-18 14:46:50 EDT; 4s ago
+
+<< OUTPUT ABRIDGED >>
+----
+
 
 Now that the service is running and certificates used comply with the
 modified *FUTURE* policy that supports shorter key lengths, connect to
@@ -28,6 +37,11 @@ being offered to client browsers.
 ----
 openssl s_client -connect localhost:443 </dev/null 2>/dev/null | grep '^Server public key'
 ----
+[source,text]
+----
+Server public key is 2048 bit
+----
+
 
 You have now configured RHEL to enforce a modified *FUTURE* crypto
 policy that can support 2048-bit or higher ciphers. Due to this setup,
