@@ -1,34 +1,8 @@
 #!/bin/bash
-#while [ ! -f /opt/instruqt/bootstrap/host-bootstrap-completed ]
-#do
-#   echo "Waiting for Instruqt to finish booting the VM"
-#   sleep 1
-#done
-
-#subscription-manager config --rhsm.manage_repos=1
-#subscription-manager register --activationkey=${ACTIVATION_KEY} --org=12451665 --force
-
-dnf install -y httpd
+# Install the mod_ssl tools to autogen a self-signed cert at start up
+dnf install -y httpd mod_ssl
 systemctl --now enable httpd
+
+# Once we have a SSL cert created at DEFAULT 2048 bit, we can up the policy for the lab
 update-crypto-policies --set FUTURE
 
-#set up tmux so it has to restart itself whenever the system reboots
-
-#step 1: make a script
-tee ~/startup-tmux.sh << EOF
-TMUX='' tmux new-session -d -s 'rhel-session' > /dev/null 2>&1
-tmux set -g pane-border-status top
-tmux setw -g pane-border-format ' #{pane_index} #{pane_current_command}'
-tmux set -g mouse on
-tmux set mouse on
-EOF
-
-#step 2: make it executable
-chmod +x ~/startup-tmux.sh
-#step 3: use cron to execute 
-echo "@reboot ~/startup-tmux.sh" | crontab -
-
-#step 4: start tmux for the lab
-~/startup-tmux.sh
-
-echo "DONE" >> /root/post-run.log
