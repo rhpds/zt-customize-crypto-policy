@@ -20,9 +20,10 @@ systemctl status httpd.service --no-pager
 ----
 [source,text]
 ----
-<< OUTPUT ABRIDGED >>
-
-Active: active (running) since Wed 2025-06-18 14:46:50 EDT; 4s ago
+[rhel@rhel ~]$ systemctl status httpd.service --no-pager
+● httpd.service - The Apache HTTP Server
+     Loaded: loaded (/usr/lib/systemd/system/httpd.service; enabled; preset: disabled)
+     Active: active (running) since Wed 2025-06-18 15:57:51 EDT; 5s ago
 
 << OUTPUT ABRIDGED >>
 ----

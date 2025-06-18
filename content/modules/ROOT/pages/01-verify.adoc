@@ -54,7 +54,12 @@ systemctl status httpd.service --no-pager
 ----
 [source,text]
 ----
+[rhel@rhel ~]$ systemctl status httpd.service --no-pager
+× httpd.service - The Apache HTTP Server
+     Loaded: loaded (/usr/lib/systemd/system/httpd.service; enabled; preset: disabled)
+     Active: failed (Result: exit-code) since Wed 2025-06-18 15:51:08 EDT; 5s ago
 
+<< OUTPUT ABRIDGED >>
 ----
 
 You can see a more specific error message in the SSL error log for
