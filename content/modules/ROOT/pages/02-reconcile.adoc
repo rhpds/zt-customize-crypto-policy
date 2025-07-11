@@ -7,14 +7,14 @@ initialized with the new cryptographic policy, however, for this
 exercise you will be individually working with the Apache web service.
 ____
 
-[source,bash]
+[source,bash,run,subs=attributes+]
 ----
 sudo systemctl restart httpd.service
 ----
 
 Verify that Apache is running on the machine.
 
-[source,bash]
+[source,bash,run,subs=attributes+]
 ----
 systemctl status httpd.service --no-pager
 ----
@@ -34,7 +34,7 @@ modified *FUTURE* policy that supports shorter key lengths, connect to
 the Apache service and validate the bit length of the certificate is
 being offered to client browsers.
 
-[source,bash]
+[source,bash,run,subs=attributes+]
 ----
 openssl s_client -connect localhost:443 </dev/null 2>/dev/null | grep '^Server public key'
 ----

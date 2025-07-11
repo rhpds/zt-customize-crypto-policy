@@ -22,7 +22,7 @@ keys of 2048 bit length. By default, the minimum key length in the
 You will now check the currently active crypto policy in effect on the
 system -
 
-[source,bash]
+[source,bash,run,subs=attributes+]
 ----
 update-crypto-policies --show
 ----
@@ -34,7 +34,7 @@ FUTURE
 
 Restart Apache.
 
-[source,bash]
+[source,bash,run,subs=attributes+]
 ----
 sudo systemctl restart httpd.service
 ----
@@ -48,7 +48,7 @@ See "systemctl status httpd.service" and "journalctl -xeu httpd.service" for det
 The Apache service has failed to start. You will now check the status of
 the Apache service -
 
-[source,bash]
+[source,bash,run,subs=attributes+]
 ----
 systemctl status httpd.service --no-pager
 ----
@@ -65,7 +65,7 @@ systemctl status httpd.service --no-pager
 You can see a more specific error message in the SSL error log for
 Apache.
 
-[source,bash]
+[source,bash,run,subs=attributes+]
 ----
 sudo tail -2 /var/log/httpd/ssl_error_log
 ----
@@ -93,25 +93,25 @@ Next, you will create a policy modifier called *2048KEYS.pmod* that will
 set the minimum key size to 2048 bits. In the policy modifier file, you will specify the minimum key size of
 both RSA and DH keys -
 
-[source,bash]
+[source,bash,run,subs=attributes+]
 ----
 echo "min_rsa_size = 2048" > 2048KEYS.pmod
 ----
 
-[source,bash]
+[source,bash,run,subs=attributes+]
 ----
 echo "min_dh_size = 2048" >> 2048KEYS.pmod
 ----
 
 Copy the modifier file to the policy module directory
-[source,bash]
+[source,bash,run,subs=attributes+]
 ----
 sudo cp 2048KEYS.pmod /etc/crypto-policies/policies/modules/2048KEYS.pmod
 ----
 You will now configure the system to use a modified *FUTURE* policy with
 our newly created policy modifier -
 
-[source,bash]
+[source,bash,run,subs=attributes+]
 ----
 sudo update-crypto-policies --set FUTURE:2048KEYS
 ----
@@ -130,7 +130,7 @@ evaluated left to right to modify the specified named policy.
 
 You can now verify that the new policy has been applied to the system.
 
-[source,bash]
+[source,bash,run,subs=attributes+]
 ----
 update-crypto-policies --show
 ----
